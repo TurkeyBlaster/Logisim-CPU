@@ -1,10 +1,11 @@
 # Logisim-CPU
 A CPU made in Logisim, bundled with tester y86 ASM and raw ROM files. Made in about 2 weeks for CSCE 312 at Texas A&M.
 
-# Features
+## Features
 The CPU is a pipelined, RISC CPU that supports the [Y86 ISA](!http://web.cse.ohio-state.edu/~reeves.92/CSE2421sp13/PracticeProblemsY86.pdf).
 
-# Usage
+## Usage
+**Note:** requires a [y86 emulator](!https://boginw.github.io/js-y86-64/) (to get the object files, called .yo files) and [Logisim](!http://www.cburch.com/logisim/download.html)
 1. Use the script yo2rom.py found in the testcode directory to convert any .yo files into raw ROM files for Logisim:
 ```
 $ python3 yo2rom.py <.yo_path> [<.raw_path>]
