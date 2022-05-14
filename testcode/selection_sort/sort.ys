@@ -1,0 +1,63 @@
+/* $begin code-yso */
+/* $begin code-ysa */
+	.pos 0						# Execution begins at address 0 
+init:	irmovl Stack, %esp  	# Set up Stack pointer
+	irmovl Stack, %ebp  	    # Set up base pointer
+	jmp Main		            # Execute main program
+
+	.align 4					# Array to be sorted
+array:	.long 0x00000001        
+	.long 0xffffff00
+	.long 0x00000010
+	.long 0xff000000
+	.long 0x00001000
+	.long 0xffffffff
+Main:	call Sort               # Main routine
+	halt
+
+Sort: 	pushl %ebp              # Sort subroutine
+	rrmovl %esp,%ebp
+	irmovl $20,%edi             # Max index
+								# Our maximum index is at 5, which is 20 bytes from the start
+	irmovl $0,%edx              # Current index
+	irmovl $4,%esi				# Increment
+	jmp Outer
+
+Inner:	pushl %ebp				# Entry point for the inner loop
+	rrmovl %esp,%ebp
+	rrmovl %edx,%ebx			# %ebx is the index of the min element in the unsorted portion of the array
+
+ILoop:	addl %esi,%edx			# Iteration
+	mrmovl array(%edx),%ecx		# Compare the current element with the supposed min
+	pushl %eax
+	subl %ecx,%eax
+	popl %eax
+	cmovg %ecx,%eax				# Update min and min_index if needed
+	cmovg %edx,%ebx
+	pushl %edi					# Break condition
+	subl %edx,%edi
+	popl %edi
+	jg ILoop
+	popl %ebp
+	ret
+								
+Outer:	pushl %edx				# Outer loop
+	mrmovl array(%edx),%eax		# %eax is the min element in the unsorted part of the list
+	call Inner
+	popl %edx
+	mrmovl array(%edx),%ecx		# Swap min element and element at the beginning of the unsorted portion
+	rmmovl %eax,array(%edx)
+	rmmovl %ecx,array(%ebx)
+	addl %esi,%edx				# Update sentinel
+	irmovl $20,%ebx				# Determine if the loop is ready to be exited
+	subl %edx,%ebx
+	jg Outer
+
+End:	popl %ebp
+	ret
+
+# The stack starts here and grows to lower addresses
+	.pos 0x200		
+Stack:	 
+/* $end code-ysa */
+/* $end code-yso */

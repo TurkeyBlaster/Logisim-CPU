@@ -1,0 +1,55 @@
+/* $begin code-yso */
+/* $begin code-ysa */
+# Execution begins at address 0 
+
+	.pos 0
+init:	irmovl Stack, %esp  	# Set up Stack pointer
+	irmovl Stack, %ebp  		# Set up base pointer
+	jmp Main					# Execute main program
+	.align 4					# Matrix 1
+mat1:	.long 0x00000001
+	.long 0xffffffff
+	.long 0x00000100
+	.long 0xffffff00
+	.long 0x00010000
+	.long 0xffff0000
+
+mat2:	.long 0x0000000a		# Matrix 2
+	.long 0x000000b0
+	.long 0x00000c00
+	.long 0x0000d000
+	.long 0x000e0000
+	.long 0x00f00000
+mat3:	.long 0x0				# Matrix 3, dst Matrix
+	.long 0x0
+	.long 0x0
+	.long 0x0
+	.long 0x0
+	.long 0x0
+Main:	call MatAdd				# Main routine
+	halt
+
+MatAdd: pushl %ebp				# Entry point
+	rrmovl %esp,%ebp
+	irmovl $0,%edx				# Index = 0
+	irmovl $1,%esi				# Sentinel decrement = 1
+	irmovl $4,%edi				# Index increment = 4 (int = 4 bytes)
+	irmovl $6,%ebx				# Size of each matrix is 6
+Loop:	mrmovl mat1(%edx),%ecx	# mat3[i] = mat1[i] + mat2[i]
+	mrmovl mat2(%edx),%eax
+	addl %ecx,%eax				
+	rmmovl %eax,mat3(%edx)
+	addl %edi,%edx
+	subl %esi,%ebx				# Update sentinel
+	jg Loop
+
+End:	popl %ebp
+	ret
+
+
+
+# The stack starts here and grows to lower addresses
+	.pos 0x100		
+Stack:	 
+/* $end code-ysa */
+/* $end code-yso */
